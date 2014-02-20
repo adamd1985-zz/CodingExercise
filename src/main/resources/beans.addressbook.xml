@@ -13,8 +13,6 @@
 
 	<context:spring-configured />
 
-	<context:component-scan base-package="exercise.addressbook.model" />
-
 	<jdbc:embedded-database id="dataSource" type="HSQL" />
 
 	<bean id="entityManagerFactory"

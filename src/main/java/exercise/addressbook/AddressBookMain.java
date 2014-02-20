@@ -26,24 +26,33 @@ public class AddressBookMain {
 
 	/**
 	 * @param args
-	 * @throws Exception 
+	 * @throws Exception
 	 */
 	public static void main(String[] args) throws Exception {
 		LOGGER.info("STARTED Gumtree address book with args {}", args);
 
-		ClassPathXmlApplicationContext app = new ClassPathXmlApplicationContext(
-				"beans.addressbook.xml");
+		ClassPathXmlApplicationContext app = null;
 
-		ContactRepository repo = (ContactRepository) app
-				.getBean(ContactRepository.class);
-		File csvFile = new ClassPathResource("addressbook.csv").getFile();
+		try {
+			app = new ClassPathXmlApplicationContext("beans.addressbook.xml");
 
-		LOGGER.info("BOOTSTRAPPING ADDRESSBOOK");
+			ContactRepository repo = (ContactRepository) app
+					.getBean(ContactRepository.class);
+			File csvFile = new ClassPathResource("addressbook.csv").getFile();
 
-		AddressBookBootstrapStrategy bootstrap = new AddressBookBootstrapCSVImpl(
-				csvFile, repo);
-		bootstrap.boot();
+			LOGGER.info("BOOTSTRAPPING ADDRESSBOOK");
 
+			AddressBookBootstrapStrategy bootstrap = new AddressBookBootstrapCSVImpl(
+					csvFile, repo);
+
+			bootstrap.boot();
+
+			LOGGER.info("DATABASE populated with: {}", repo.findAll());
+		} finally {
+			if (app != null) {
+				app.close();
+			}
+		}
 	}
 
 }

@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.List;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +29,8 @@ import exercise.addressbook.services.AddressBookBootstrapStrategy;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = { "classpath:beans.test.addressbook.xml" })
 @TransactionConfiguration
-public class AddressBookBootstrapCSVTest {
+@Ignore
+public class ContactRepositoryTest {
 
 	private AddressBookBootstrapStrategy testClass = null;
 	private File csvFile = null;
@@ -38,70 +40,47 @@ public class AddressBookBootstrapCSVTest {
 
 	// ========================================================================
 
-	/**
-	 * Given a CSV file with 5 healthy records, then the test should add these
-	 * to the database and retrieve all 5 of them.
-	 * 
-	 * @throws Exception
-	 */
 	@Transactional
-	@Test
-	public void testBootingOfValidData() throws Exception {
-
+	public void before() throws Exception {
 		this.csvFile = new ClassPathResource("test.addressbook.csv").getFile();
 		this.testClass = new AddressBookBootstrapCSVImpl(this.csvFile,
 				this.repo);
 
 		this.testClass.boot();
-		List<Contact> contacts = this.repo.findAll();
-
-		Assert.assertNotNull(contacts);
-		Assert.assertEquals(5, contacts.size());
 	}
 
 	/**
-	 * Given a CSV file with 1 healthy and 4 malformed (empty commas, missing
-	 * info, and malformed date or gender), then the test should add only the
-	 * healthy one to the database and retrieve it only.
+	 * Given 5 contacts with 2 females, when queried on females only 2 should be
+	 * returned.
 	 * 
 	 * @throws Exception
 	 */
 	@Transactional
 	@Test
-	public void testBootingOfInValidData() throws Exception {
-
-		this.csvFile = new ClassPathResource("test.invaliddata.addressbook.csv")
-				.getFile();
-		this.testClass = new AddressBookBootstrapCSVImpl(this.csvFile,
-				this.repo);
-
-		this.testClass.boot();
-		List<Contact> contacts = this.repo.findAll();
-
-		Assert.assertNotNull(contacts);
-		Assert.assertEquals(1, contacts.size());
+	public void testRetrievalOnGender() {
+		Assert.fail();
 	}
 
 	/**
-	 * Given a CSV file with 1 healthy and 4 malformed (empty commas, missing
-	 * info, and malformed date or gender), then the test should add only the
-	 * healthy one to the database and retrieve it only.
+	 * Given 5 contacts, when the eldest is queried, one oldest contact must be
+	 * returned.
 	 * 
 	 * @throws Exception
 	 */
 	@Transactional
 	@Test
-	public void testBootingOfEmptyData() throws Exception {
+	public void testRetrievalOfEldest() {
+		Assert.fail();
+	}
 
-		this.csvFile = new ClassPathResource("test.empty.addressbook.csv")
-				.getFile();
-		this.testClass = new AddressBookBootstrapCSVImpl(this.csvFile,
-				this.repo);
-
-		this.testClass.boot();
-		List<Contact> contacts = this.repo.findAll();
-
-		Assert.assertNotNull(contacts);
-		Assert.assertEquals(0, contacts.size());
+	/**
+	 * Given two contacts, the age difference in days should be calculated.
+	 * 
+	 * @throws Exception
+	 */
+	@Transactional
+	@Test
+	public void testRetrievalOfAgeDifference() {
+		Assert.fail();
 	}
 }
