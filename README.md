@@ -18,8 +18,29 @@ The user wants to perform a simple set of queries on a lightweight address book.
 - Boot the given file or create contacts in DB.
 - An address book contact is made up of name, sex and date of birth.
 
-### Build and Execution
+## Build and Execution
 
 - MAVEN: 
--- mvn clean install
--- mvn exec:java 
+-   mvn clean install
+-   mvn exec:java 
+- parameters can be found in the build section of the POM file.
+
+- Java
+-   java -jar
+
+### USAGE
+
+java -jar addressbook QUERY QUERYPARAMS ADDRESSBOOKFILE
+- QUERY: [searchGender, getEldest or getAgeDifference]
+-   searchGender: search for gender, gender parameter required.
+-   getEldest: get eldest.
+-   getAgeDifference: Get age difference in days of two contacts, two name parameters required.
+- QUERYPARAMS:
+-   for query searchGender: ["Male" or "Female"].
+-   for query getAgeDifference these two space separated (use quotes): "Firstname Lastname" "Firstname Lastname"
+- ADDRESSBOOKFILE
+-   The location of an address book with comma separated values as contact fields and each new line a new record. 
+- EXAMPLES
+-   java -jar addressbook searchGender "Female" "C:\addressbook.csv"
+-   java -jar addressbook getEldest "C:\addressbook.csv"
+-   java -jar addressbook getAgeDifference "Adam Darmanin" "Joe Temple" "C:\addressbook.csv"

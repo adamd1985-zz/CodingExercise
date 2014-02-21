@@ -64,4 +64,10 @@ public class Contact {
 		this.dateOfBirth = dateOfBirth;
 	}
 
+	@Override
+	public String toString() {
+		return "NAME: " + getName() + " GENDER: " + getGender() + " DOB: "
+				+ getDateOfBirth();
+	}
+
 }
