@@ -27,4 +27,6 @@
 	</bean>
 
 	<jpa:repositories base-package="exercise.addressbook.datarepositories" />
+
+	<context:component-scan base-package="exercise.addressbook.services" />
 </beans>

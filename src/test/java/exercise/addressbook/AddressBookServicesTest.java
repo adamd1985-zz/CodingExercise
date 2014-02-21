@@ -4,7 +4,7 @@ import java.io.File;
 import java.util.List;
 
 import org.junit.Assert;
-import org.junit.Ignore;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,8 +16,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import exercise.addressbook.datarepositories.ContactRepository;
 import exercise.addressbook.model.Contact;
+import exercise.addressbook.model.GenderEnum;
 import exercise.addressbook.services.AddressBookBootstrapCSVImpl;
 import exercise.addressbook.services.AddressBookBootstrapStrategy;
+import exercise.addressbook.services.AddressBookServices;
 
 /**
  * Tests that the bootstrapping correctly happens and all correct data is
@@ -29,8 +31,8 @@ import exercise.addressbook.services.AddressBookBootstrapStrategy;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = { "classpath:beans.test.addressbook.xml" })
 @TransactionConfiguration
-@Ignore
-public class ContactRepositoryTest {
+@Transactional
+public class AddressBookServicesTest {
 
 	private AddressBookBootstrapStrategy testClass = null;
 	private File csvFile = null;
@@ -38,9 +40,12 @@ public class ContactRepositoryTest {
 	@Autowired
 	private ContactRepository repo;
 
+	@Autowired
+	private AddressBookServices services;
+
 	// ========================================================================
 
-	@Transactional
+	@Before
 	public void before() throws Exception {
 		this.csvFile = new ClassPathResource("test.addressbook.csv").getFile();
 		this.testClass = new AddressBookBootstrapCSVImpl(this.csvFile,
@@ -53,34 +58,81 @@ public class ContactRepositoryTest {
 	 * Given 5 contacts with 2 females, when queried on females only 2 should be
 	 * returned.
 	 * 
-	 * @throws Exception
 	 */
-	@Transactional
 	@Test
 	public void testRetrievalOnGender() {
-		Assert.fail();
+		List<Contact> females = this.services
+				.getAllContactsByGender(GenderEnum.FEMALE);
+
+		Assert.assertEquals(2, females.size());
+		Assert.assertEquals(females.get(0).getGender(),
+				GenderEnum.FEMALE.getGenderStr());
+		Assert.assertEquals(females.get(1).getGender(),
+				GenderEnum.FEMALE.getGenderStr());
+	}
+
+	/**
+	 * Same as above but to see that on an empty database it returns nothing
+	 * without error.
+	 * 
+	 */
+	@Test
+	public void testRetrievalOnGenderOnEmptyDB() {
+		this.repo.deleteAll();
+
+		List<Contact> females = this.services
+				.getAllContactsByGender(GenderEnum.FEMALE);
+
+		Assert.assertEquals(0, females.size());
 	}
 
 	/**
 	 * Given 5 contacts, when the eldest is queried, one oldest contact must be
 	 * returned.
 	 * 
-	 * @throws Exception
 	 */
-	@Transactional
 	@Test
 	public void testRetrievalOfEldest() {
-		Assert.fail();
+		Contact eldest = this.services.getEldestContact();
+		Assert.assertEquals("Wes Jackson", eldest.getName());
+
+	}
+
+	/**
+	 * Same as above but to see that on an empty database it returns nothing
+	 * without error.
+	 */
+	@Test
+	public void testRetrievalOfEldestOnEmptyDB() {
+		this.repo.deleteAll();
+		Contact eldest = this.services.getEldestContact();
+		Assert.assertNull(eldest);
 	}
 
 	/**
 	 * Given two contacts, the age difference in days should be calculated.
-	 * 
-	 * @throws Exception
 	 */
-	@Transactional
 	@Test
 	public void testRetrievalOfAgeDifference() {
-		Assert.fail();
+		Long days = this.services.getDateDifferenceInDaysBetweenContacts(
+				"Paul Robinson", "Bill McKnight");
+
+		Assert.assertEquals(2862L, days.longValue());
+	}
+
+	/**
+	 * Same as above but to see that on an empty database it returns nothing
+	 * without error.
+	 * 
+	 * Should deal with the case where all or one is missing from the names given.
+	 */
+	@Test
+	public void testRetrievalOfAgeDifferenceOnEmptyDB() {
+		this.repo.deleteAll();
+		
+		Long days = this.services.getDateDifferenceInDaysBetweenContacts(
+				"Paul Robinson", "Bill McKnight");
+
+		Assert.assertNull(days);
 	}
 }
