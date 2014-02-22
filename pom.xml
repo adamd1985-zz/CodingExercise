@@ -131,6 +131,12 @@
 			<version>4.11</version>
 		</dependency>
 
+		<dependency>
+			<groupId>org.easymock</groupId>
+			<artifactId>easymock</artifactId>
+			<version>3.2</version>
+		</dependency>
+
 	</dependencies>
 
 	<build>
@@ -163,6 +169,8 @@
 					<descriptors>
 						<descriptor>${basedir}/src/main/resources/assembly.xml</descriptor>
 					</descriptors>
+					<finalName>addressbook</finalName>
+					<appendAssemblyId>false</appendAssemblyId>
 				</configuration>
 			</plugin>
 
@@ -180,7 +188,7 @@
 				<configuration>
 					<mainClass>exercise.addressbook.AddressBookMain</mainClass>
 					<arguments>
-						<argument>D:\Workspace\Experiments\CodingExercise\src\main\resources\addressbook.csv</argument>
+						<argument>C:\workspaces\exams\CodingExercise\src\main\resources\addressbook.csv</argument>
 						<argument>searchGender</argument>
 						<argument>Female</argument>
 					</arguments>

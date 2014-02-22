@@ -1,5 +1,25 @@
 # Coding Exercise
 
+## USAGE
+
+Note: An assembled JAR is available stand-alone in this project's root dir as "addressbook.jar" for those who wish to skip compilation.
+
+java -jar addressbook ADDRESSBOOKFILE QUERY [QUERYPARAMS, ...]
+ADDRESSBOOKFILE
+-The location of an address book with comma separated values as contact fields and each new line a new record. 
+QUERY: [searchGender, getEldest or getAgeDifference]
+-searchGender: search for gender, gender parameter required.
+-getEldest: get eldest.
+- getAgeDifference: Get age difference in days of two contacts, two name parameters required.
+QUERYPARAMS:
+-for query searchGender: ["Male" or "Female"].
+-for query getAgeDifference these two space separated (use quotes): "Firstname Lastname" "Firstname Lastname"
+
+EXAMPLES
+-java -jar addressbook searchGender "Female" "C:\addressbook.csv"
+-java -jar addressbook getEldest "C:\addressbook.csv"
+-java -jar addressbook getAgeDifference "Adam Darmanin" "Joe Temple" "C:\addressbook.csv"
+
 ## The story 
 
 The user wants to perform a simple set of queries on a lightweight address book.
@@ -22,25 +42,8 @@ The user wants to perform a simple set of queries on a lightweight address book.
 
 - MAVEN: 
 -   mvn clean install
--   mvn exec:java 
-- parameters can be found in the build section of the POM file.
+-   mvn exec:java: for quick execution. Parameters can be found in the build section of the POM file.
 
-- Java
--   java -jar
-
-### USAGE
-
-java -jar addressbook QUERY QUERYPARAMS ADDRESSBOOKFILE
-- QUERY: [searchGender, getEldest or getAgeDifference]
--   searchGender: search for gender, gender parameter required.
--   getEldest: get eldest.
--   getAgeDifference: Get age difference in days of two contacts, two name parameters required.
-- QUERYPARAMS:
--   for query searchGender: ["Male" or "Female"].
--   for query getAgeDifference these two space separated (use quotes): "Firstname Lastname" "Firstname Lastname"
-- ADDRESSBOOKFILE
--   The location of an address book with comma separated values as contact fields and each new line a new record. 
-- EXAMPLES
--   java -jar addressbook searchGender "Female" "C:\addressbook.csv"
--   java -jar addressbook getEldest "C:\addressbook.csv"
--   java -jar addressbook getAgeDifference "Adam Darmanin" "Joe Temple" "C:\addressbook.csv"
+## Iteration 2 (Future)
+- Simple JQuery front end
+- Spring MVC to service browser requests.

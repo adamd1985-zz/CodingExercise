@@ -3,13 +3,15 @@
  */
 package exercise.addressbook;
 
-
 import java.io.File;
+import java.util.Arrays;
 import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.stereotype.Component;
 
 import exercise.addressbook.datarepositories.ContactRepository;
 import exercise.addressbook.model.Contact;
@@ -18,14 +20,13 @@ import exercise.addressbook.services.AddressBookBootstrapCSVImpl;
 import exercise.addressbook.services.AddressBookBootstrapStrategy;
 import exercise.addressbook.services.AddressBookServices;
 
-
-
 /**
  * Program entry point.
  * 
  * @author adam
  * @version 1
  */
+@Component
 public class AddressBookMain {
 
 	private static final Logger LOGGER = LoggerFactory
@@ -46,21 +47,27 @@ public class AddressBookMain {
 			+ "-   java -jar addressbook getEldest \"C:\\addressbook.csv\"\n"
 			+ "-   java -jar addressbook getAgeDifference \"Adam Darmanin\" \"Joe Temple\" \"C:\\addressbook.csv\"\n";
 
-	private static final String SEARCHGENDERQUERY = "searchGender";
-	private static final String GETELDESTQUERY = "getEldest";
-	private static final String GETAGEDIFFERENCEQUERY = "getAgeDifference";
+	/**
+	 * Define user commands.
+	 * 
+	 */
+	enum USERQUERY {
+		searchGender, getEldest, getAgeDifference
+	}
 
+	@Autowired
+	private ContactRepository contactRepository;
 
+	@Autowired
+	private AddressBookServices addressBookService;
 
 	// ========================================================================
-
 
 	/**
 	 * @param args
 	 * @throws Exception
 	 */
-	public static void main(String[] args)
-			throws Exception {
+	public static void main(String[] args) throws Exception {
 		LOGGER.info("STARTED Gumtree address book with args {}", args);
 
 		ClassPathXmlApplicationContext contextApp = null;
@@ -72,90 +79,158 @@ public class AddressBookMain {
 			}
 
 			LOGGER.info("**** STARTING SPRING");
-			contextApp = new ClassPathXmlApplicationContext("classpath:beans.addressbook.xml");
-			ContactRepository contactRepository = (ContactRepository) contextApp
-					.getBean(ContactRepository.class);
-			AddressBookServices addressBookService = (AddressBookServices) contextApp
-					.getBean(AddressBookServices.class);
+			contextApp = new ClassPathXmlApplicationContext(
+					"classpath:beans.addressbook.xml");
 
-			File bootStrapFile = new File(args[0]);
-			if ((!bootStrapFile.exists()) && (!bootStrapFile.isFile())) {
-				throw new IllegalArgumentException(
-						"No or invalid AddressBook file loaded.");
-			}
+			AddressBookMain main = (AddressBookMain) contextApp
+					.getBean(AddressBookMain.class);
 
-			LOGGER.info("**** BOOTSTRAPPING ADDRESSBOOK");
-			AddressBookBootstrapStrategy bootstrap = new AddressBookBootstrapCSVImpl(
-					bootStrapFile, contactRepository);
-			bootstrap.boot();
+			main.init(args[0].trim());
+			main.processUserQuery(args[1].trim(), Arrays.copyOfRange(args,
+					Math.min(args.length - 1, 2), args.length));
 
-			processUserQuery(args, addressBookService);
-		}
-		catch (IllegalArgumentException exception) {
+		} catch (IllegalArgumentException exception) {
 			System.out.println(exception.getMessage());
 			System.out.println(USAGE);
-		}
-		catch (Exception exception) {
+		} catch (Exception exception) {
 			LOGGER.info("ERROR with program execution: ", exception);
 		}
 	}
 
+	// ------------------------------------------------------------------------
 
 	/**
-	 * Process user query.
+	 * Initialises environment for user query.
 	 * 
-	 * @param args
-	 *            program args
-	 * @param addressBookService
-	 *            Data service to use.
+	 * @param bootStrapFileName
+	 * @throws Exception
+	 */
+	public void init(String bootStrapFileName) throws Exception {
+		File bootStrapFile = new File(bootStrapFileName);
+		if ((!bootStrapFile.exists()) && (!bootStrapFile.isFile())) {
+			throw new IllegalArgumentException(
+					"No or invalid AddressBook file loaded.");
+		}
+
+		LOGGER.info("**** BOOTSTRAPPING ADDRESSBOOK");
+		AddressBookBootstrapStrategy bootstrap = new AddressBookBootstrapCSVImpl(
+				bootStrapFile, contactRepository);
+		bootstrap.boot();
+	}
+
+	/**
+	 * Process user query from the command line.
+	 * 
+	 * @param userQueryStr
+	 *            The user command.
+	 * @param queryParams
+	 *            the command params.
 	 * @throws IllegalArgumentException
 	 */
-	private static void processUserQuery(String[] args, AddressBookServices addressBookService)
+	public void processUserQuery(String userQueryStr, String[] queryParams)
 			throws IllegalArgumentException {
-		String userQuery = args[1].trim();
-		if (userQuery.equals(SEARCHGENDERQUERY)) {
-			System.out.println("Searching by gender...");
-			if (args.length < 3) {
+
+		USERQUERY userQuery = USERQUERY.valueOf(userQueryStr);
+
+		if (userQuery == null) {
+			throw new IllegalArgumentException("Unknown Query command: "
+					+ userQuery);
+		}
+
+		switch (userQuery) {
+		case searchGender:
+			if (queryParams.length != 1) {
 				throw new IllegalArgumentException(
 						"Insufficient arguments to search by gender");
 			}
-			GenderEnum gender = GenderEnum.getGenderForString(args[2]);
-			if (gender == null) {
-				throw new IllegalArgumentException(
-						"Invalid gender selected");
-			}
+			runGetGenderQuery(queryParams[0]);
+			break;
 
-			List<Contact> contacts = addressBookService
-					.getAllContactsByGender(gender);
-			System.out.println(String.format(
-					"...Found %d contacts by gender %s", contacts.size(),
-					gender.getGenderStr()));
-			for (Contact contact : contacts) {
-				System.out.println(contact);
-			}
-		}
-		else if (userQuery.equals(GETELDESTQUERY)) {
-			System.out.println("Searching the eldest...");
-			Contact contact = addressBookService.getEldestContact();
-			System.out
-					.println((contact == null ? "...results returned nothing"
-							: "... eldest: " + contact));
-		}
-		else if (userQuery.equals(GETAGEDIFFERENCEQUERY)) {
-			System.out.println("Retrieving DOB difference in days...");
-			if (args.length < 4) {
+		case getEldest:
+			runGetEldestQuery();
+			break;
+
+		case getAgeDifference:
+			if (queryParams.length != 2) {
 				throw new IllegalArgumentException(
 						"Insufficient arguments for DOB difference");
 			}
-			Long dobDifference = addressBookService
-					.getDateDifferenceInDaysBetweenContacts(args[2],
-							args[3]);
-			System.out
-					.println((dobDifference == null ? "...contacts couldn't be found"
-							: "...difference in days is: " + dobDifference));
-		}
-		else {
-			throw new IllegalArgumentException("Unknown Query");
+			runGetAgeDifferenceQuery(queryParams[0], queryParams[1]);
+			break;
 		}
 	}
+
+	/**
+	 * Called with: addressbook getAgeDifference "Adam Darmanin" "Joe Temple"
+	 * "C:\addressbook.csv"
+	 * 
+	 * @param name1
+	 *            Name of first contact to compare.
+	 * @param name2
+	 *            Name of second contact to compare.
+	 */
+	private void runGetAgeDifferenceQuery(String name1, String name2) {
+		System.out.println("Retrieving DOB difference in days...");
+
+		Long dobDifference = addressBookService
+				.getDateDifferenceInDaysBetweenContacts(name1, name2);
+
+		System.out
+				.println((dobDifference == null ? "...contacts couldn't be found"
+						: "...difference in days is: " + dobDifference));
+	}
+
+	/**
+	 * Called with: addressbook getEldest "C:\addressbook.csv"
+	 * 
+	 */
+	private void runGetEldestQuery() {
+		System.out.println("Searching the eldest...");
+		Contact contact = addressBookService.getEldestContact();
+		System.out.println((contact == null ? "...results returned nothing"
+				: "... eldest: " + contact));
+	}
+
+	/**
+	 * Called with: java -jar addressbook searchGender "Female"
+	 * "C:\addressbook.csv"
+	 * 
+	 * @param genderParam
+	 *            Gender string passed.
+	 * @throws IllegalArgumentException
+	 */
+	private void runGetGenderQuery(String genderParam)
+			throws IllegalArgumentException {
+		System.out.println("Searching by gender...");
+
+		GenderEnum gender = GenderEnum.getGenderForString(genderParam);
+		if (gender == null) {
+			throw new IllegalArgumentException("Invalid gender selected");
+		}
+
+		List<Contact> contacts = addressBookService
+				.getAllContactsByGender(gender);
+		System.out.println(String.format("...Found %d contacts by gender %s",
+				contacts.size(), gender.getGenderStr()));
+		for (Contact contact : contacts) {
+			System.out.println(contact);
+		}
+	}
+
+	public ContactRepository getContactRepository() {
+		return contactRepository;
+	}
+
+	public void setContactRepository(ContactRepository contactRepository) {
+		this.contactRepository = contactRepository;
+	}
+
+	public AddressBookServices getAddressBookService() {
+		return addressBookService;
+	}
+
+	public void setAddressBookService(AddressBookServices addressBookService) {
+		this.addressBookService = addressBookService;
+	}
+
 }
