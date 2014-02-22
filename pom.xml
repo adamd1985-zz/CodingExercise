@@ -3,8 +3,8 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>exercise</groupId>
 	<artifactId>addressbook</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
-	<packaging>jar</packaging>
+	<version>0.0.2-SNAPSHOT</version>
+	<packaging>war</packaging>
 
 	<name>Address Book Coding Exercise for Gumtree</name>
 
@@ -38,6 +38,46 @@
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-aspects</artifactId>
 			<version>${spring.version}</version>
+		</dependency>
+
+		<!-- web -->
+
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>servlet-api</artifactId>
+			<version>2.5</version>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.glassfish.web</groupId>
+			<artifactId>javax.el</artifactId>
+			<version>2.2.4</version>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-context-support</artifactId>
+			<version>${spring.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-web</artifactId>
+			<version>${spring.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-webmvc</artifactId>
+			<version>${spring.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.freemarker</groupId>
+			<artifactId>freemarker</artifactId>
+			<version>2.3.20</version>
 		</dependency>
 
 		<!-- Data layer -->
@@ -84,6 +124,12 @@
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-validator</artifactId>
 			<version>${hibernate.validator.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.glassfish.web</groupId>
+					<artifactId>javax.el</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 
 		<dependency>
@@ -151,47 +197,32 @@
 			</plugin>
 
 			<plugin>
-				<executions>
-					<execution>
-						<id>make-assembly</id>
-						<phase>package</phase>
-						<goals>
-							<goal>single</goal>
-						</goals>
-					</execution>
-				</executions>
-				<artifactId>maven-assembly-plugin</artifactId>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-war-plugin</artifactId>
 				<configuration>
-					<finalName>addressbook</finalName>
-					<archive>
-						<manifestFile>META-INF/MANIFEST.MF</manifestFile>
-					</archive>
-					<descriptors>
-						<descriptor>${basedir}/src/main/resources/assembly.xml</descriptor>
-					</descriptors>
-					<finalName>addressbook</finalName>
-					<appendAssemblyId>false</appendAssemblyId>
+					<webXml>${basedir}/src/main/webapp/WEB-INF/web.xml</webXml>
+					<warName>addressbook</warName>
 				</configuration>
 			</plugin>
 
 			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>exec-maven-plugin</artifactId>
-				<version>1.2.1</version>
+				<groupId>org.apache.tomcat.maven</groupId>
+				<artifactId>tomcat7-maven-plugin</artifactId>
+				<version>2.1</version>
 				<executions>
 					<execution>
+						<id>tomcat-run</id>
 						<goals>
-							<goal>java</goal>
+							<goal>exec-war-only</goal>
 						</goals>
+						<phase>package</phase>
 					</execution>
 				</executions>
 				<configuration>
-					<mainClass>exercise.addressbook.AddressBookMain</mainClass>
-					<arguments>
-						<argument>C:\workspaces\exams\CodingExercise\src\main\resources\addressbook.csv</argument>
-						<argument>searchGender</argument>
-						<argument>Female</argument>
-					</arguments>
+					<url>http://localhost:8080/manager/text</url>
+					<server>localhost</server>
+					<path>/addressbook</path>
+					<finalName>addressbook-warexec.jar</finalName>
 				</configuration>
 			</plugin>
 		</plugins>

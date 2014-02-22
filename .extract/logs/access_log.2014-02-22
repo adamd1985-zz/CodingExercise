@@ -1,0 +1,10 @@
+0:0:0:0:0:0:0:1 - - [22/Feb/2014:21:36:34 +0100] GET /addressbook/exercise HTTP/1.1 404 949 http-bio-8080-exec-1 351
+0:0:0:0:0:0:0:1 - - [22/Feb/2014:21:36:44 +0100] GET /manager/html/list HTTP/1.1 404 - http-bio-8080-exec-2 0
+0:0:0:0:0:0:0:1 - - [22/Feb/2014:21:36:47 +0100] GET /addressbook/exercise HTTP/1.1 404 949 http-bio-8080-exec-4 0
+0:0:0:0:0:0:0:1 - - [22/Feb/2014:21:36:47 +0100] GET /addressbook/exercise HTTP/1.1 404 949 http-bio-8080-exec-6 0
+0:0:0:0:0:0:0:1 - - [22/Feb/2014:21:36:48 +0100] GET /addressbook/exercise HTTP/1.1 404 949 http-bio-8080-exec-8 0
+0:0:0:0:0:0:0:1 - - [22/Feb/2014:21:36:48 +0100] GET /addressbook/exercise HTTP/1.1 404 949 http-bio-8080-exec-10 0
+0:0:0:0:0:0:0:1 - - [22/Feb/2014:21:36:49 +0100] GET /addressbook/exercise HTTP/1.1 404 949 http-bio-8080-exec-2 0
+0:0:0:0:0:0:0:1 - - [22/Feb/2014:21:36:50 +0100] GET /addressbook/exercise HTTP/1.1 404 949 http-bio-8080-exec-4 0
+0:0:0:0:0:0:0:1 - - [22/Feb/2014:21:36:53 +0100] GET /addressbook HTTP/1.1 404 949 http-bio-8080-exec-4 0
+0:0:0:0:0:0:0:1 - - [22/Feb/2014:21:37:21 +0100] GET /addressbook/addressbook/exercise HTTP/1.1 200 150 http-bio-8080-exec-4 990
