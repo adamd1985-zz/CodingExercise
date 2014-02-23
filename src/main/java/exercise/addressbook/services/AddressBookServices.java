@@ -42,4 +42,5 @@ public interface AddressBookServices {
 	 */
 	public Long getDateDifferenceInDaysBetweenContacts(String name1,
 			String name2);
+
 }

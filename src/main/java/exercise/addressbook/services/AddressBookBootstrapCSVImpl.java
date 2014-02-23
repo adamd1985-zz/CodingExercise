@@ -9,6 +9,9 @@ import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
@@ -31,6 +34,7 @@ import exercise.addressbook.model.GenderEnum;
  * @author adam
  * @version 1
  */
+@Component
 public class AddressBookBootstrapCSVImpl implements
 		AddressBookBootstrapStrategy {
 
@@ -43,9 +47,16 @@ public class AddressBookBootstrapCSVImpl implements
 	private final static DateTimeFormatter DOB_FORMATTER = DateTimeFormat
 			.forPattern("dd/MM/yy");
 
+	@Autowired
 	private ContactRepository contactRepository;
+	
+	
 
 	// ========================================================================
+
+	public AddressBookBootstrapCSVImpl() {
+
+	}
 
 	public AddressBookBootstrapCSVImpl(File csvFile,
 			ContactRepository contactRepository) {
@@ -57,6 +68,7 @@ public class AddressBookBootstrapCSVImpl implements
 		return csvFile;
 	}
 
+	@Value("classpath:${addressbookBootfileName}")
 	public void setCsvFile(File csvFile) {
 		this.csvFile = csvFile;
 	}

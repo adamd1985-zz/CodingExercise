@@ -11,6 +11,10 @@
    		<param-name>contextConfigLocation</param-name>
    		<param-value>/WEB-INF/DispatcherServlet-servlet.xml</param-value>
 	</context-param>
+	<context-param>
+		<param-name>addressbookBootfileName</param-name>
+   		<param-value>addressbook.csv</param-value>
+	</context-param>
 
 	<listener>
    		<listener-class>
@@ -27,6 +31,7 @@
     </servlet>
     <servlet-mapping>
         <servlet-name>DispatcherServlet</servlet-name>
-        <url-pattern>/*</url-pattern>
+        <url-pattern>/exercise</url-pattern>
+        <url-pattern>/exercise/*</url-pattern>
     </servlet-mapping>
 </web-app>

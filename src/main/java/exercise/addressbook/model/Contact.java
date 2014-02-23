@@ -3,6 +3,7 @@
  */
 package exercise.addressbook.model;
 
+import java.io.Serializable;
 import java.util.Date;
 
 import javax.persistence.Entity;
@@ -18,7 +19,10 @@ import javax.validation.constraints.NotNull;
  * @version 1
  */
 @Entity
-public class Contact {
+public class Contact implements Serializable {
+	
+	private static final long serialVersionUID = -576002807134679297L;
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
