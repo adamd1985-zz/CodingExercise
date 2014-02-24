@@ -14,6 +14,8 @@
 	<context:spring-configured />
 
 	<jdbc:embedded-database id="dataSource" type="HSQL" />
+	
+	<context:property-placeholder location="classpath:addressbook.test.properties"/>
 
 	<bean id="entityManagerFactory"
 		class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">

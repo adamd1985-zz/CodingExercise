@@ -15,6 +15,15 @@ import exercise.addressbook.model.GenderEnum;
  * @version 1
  */
 public interface AddressBookServices {
+	
+	/**
+	 * Get all contacts in the address book.
+	 * 
+	 * TODO: Potential for pagination in case of large book.
+	 * 
+	 * @return List of contacts.
+	 */
+	public List<Contact> getAllContacts();
 
 	/**
 	 * Get by gender.

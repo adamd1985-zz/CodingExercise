@@ -10,12 +10,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.ModelAndView;
 
 import exercise.addressbook.model.Contact;
 import exercise.addressbook.model.GenderEnum;
@@ -41,6 +43,8 @@ public class AddressBookController implements InitializingBean {
 	@Autowired
 	private AddressBookBootstrapStrategy bootstrap;
 
+	static boolean CONTROLLER_INITIALIZED = false;
+
 	/**
 	 * Define user commands.
 	 * 
@@ -58,12 +62,13 @@ public class AddressBookController implements InitializingBean {
 	 * @return The index view (FTL)
 	 */
 	@RequestMapping(value = "/exercise", method = RequestMethod.GET)
-	public String index(@ModelAttribute("model") ModelMap model) {
+	public ModelAndView index() {
 		LOGGER.info("ADDRESS BOOK EXERCISE REQUEST ==========");
+		ModelMap model = new ModelMap();
 
-		model.addAttribute("MsTime", System.currentTimeMillis());
+		model.addAttribute("contacts", addressBookService.getAllContacts());
 
-		return "addressbook";
+		return new ModelAndView("addressbook", model);
 	}
 
 	/**
@@ -75,9 +80,9 @@ public class AddressBookController implements InitializingBean {
 	 *            Name of second contact to compare.
 	 */
 	@RequestMapping(value = "/getAgeDifferenceQuery", method = RequestMethod.GET)
-	public String getAgeDifferenceQuery(
-			@ModelAttribute("model") ModelMap model,
-			@RequestParam String name1, @RequestParam String name2) {
+	@ResponseBody
+	public QueryResponse getAgeDifferenceQuery(@RequestParam String name1,
+			@RequestParam String name2) {
 		LOGGER.info("Retrieving DOB difference in days...");
 
 		Long dobDifference = addressBookService
@@ -85,13 +90,11 @@ public class AddressBookController implements InitializingBean {
 
 		QueryResponse response = new QueryResponse();
 
-		response.setType(USERQUERY.getAgeDifference.name());
-		response.setMsg("DOB Difference in days: " + dobDifference);
-		response.setContacts(null);
+		response.setError(false);
+		response.setErrorMsg(null);
+		response.setValue(dobDifference);
 
-		model.addAttribute("queryResponse", response);
-
-		return "addressbook";
+		return response;
 	}
 
 	/**
@@ -99,7 +102,8 @@ public class AddressBookController implements InitializingBean {
 	 * 
 	 */
 	@RequestMapping(value = "/getEldestQuery", method = RequestMethod.GET)
-	public String runGetEldestQuery(@ModelAttribute("model") ModelMap model) {
+	@ResponseBody
+	public QueryResponse runGetEldestQuery() {
 		LOGGER.info("Searching the eldest...");
 
 		List<Contact> contacts = new ArrayList<Contact>();
@@ -109,13 +113,11 @@ public class AddressBookController implements InitializingBean {
 
 		QueryResponse response = new QueryResponse();
 
-		response.setType(USERQUERY.getEldest.name());
-		response.setMsg(null);
-		response.setContacts(contacts);
+		response.setError(false);
+		response.setErrorMsg(null);
+		response.setValue(contacts);
 
-		model.addAttribute("queryResponse", response);
-
-		return "addressbook";
+		return response;
 	}
 
 	/**
@@ -126,36 +128,44 @@ public class AddressBookController implements InitializingBean {
 	 * @throws IllegalArgumentException
 	 */
 	@RequestMapping(value = "/getGenderQuery", method = RequestMethod.GET)
-	public String runGetGenderQuery(@ModelAttribute("model") ModelMap model,
-			@RequestParam String genderParam) throws IllegalArgumentException {
+	@ResponseBody
+	public QueryResponse runGetGenderQuery(@RequestParam String genderParam)
+			throws IllegalArgumentException {
 		LOGGER.info("Searching by gender...");
-
-		GenderEnum gender = GenderEnum.getGenderForString(genderParam);
-		if (gender == null) {
-			throw new IllegalArgumentException("Invalid gender selected");
-		}
-
-		List<Contact> contacts = addressBookService
-				.getAllContactsByGender(gender);
 
 		QueryResponse response = new QueryResponse();
 
-		response.setType(USERQUERY.searchGender.name());
-		response.setMsg(null);
-		response.setContacts(contacts);
+		try {
+			GenderEnum gender = GenderEnum.getGenderForString(genderParam);
+			if (gender == null) {
+				throw new IllegalArgumentException("Invalid gender selected");
+			}
 
-		model.addAttribute("queryResponse", response);
+			List<Contact> contacts = addressBookService
+					.getAllContactsByGender(gender);
 
-		return "addressbook";
+			response.setError(false);
+			response.setErrorMsg(null);
+			response.setValue(contacts);
+		} catch (IllegalArgumentException e) {
+			response.setError(true);
+			response.setErrorMsg(e.getMessage());
+			response.setValue(null);
+		}
+
+		return response;
 	}
 
 	/**
 	 * Boots the DB with data.
 	 */
 	@Override
-	public void afterPropertiesSet() throws Exception {
+	public synchronized void afterPropertiesSet() throws Exception {
 		LOGGER.info("**** BOOTSTRAPPING ADDRESSBOOK");
 
-		bootstrap.boot();
+		if (!CONTROLLER_INITIALIZED) {
+			bootstrap.boot();
+			CONTROLLER_INITIALIZED = true;
+		}
 	}
 }

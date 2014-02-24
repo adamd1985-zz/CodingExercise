@@ -37,6 +37,14 @@ public class AddressBookServicesImpl
 
 
 	// ========================================================================
+	
+	/*
+	 * (non-Javadoc)
+	 * @see exercise.addressbook.services.AddressBookServices#getAllContacts()
+	 */
+	public List<Contact> getAllContacts(){
+		return this.contactRepo.findAll();
+	}
 
 	/*
 	 * (non-Javadoc)

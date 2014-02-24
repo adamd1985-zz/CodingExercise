@@ -1,27 +1,32 @@
 # Coding Exercise
 
+## Tags
+
+The project is split into to iterations tagged on github, please select the iteration you need to download:
+
+- iteration-1: simple jar file that takes an address book and queries from the command line.
+- iteration-2: self contained webapp that presents a control panel and prints results on browser.
+
 ## USAGE
 
-Note: An assembled JAR is available stand-alone in this project's root dir as "addressbook.jar" for those who wish to skip compilation.
+In this iteration one may find in the root directory of this project the jar: addressbook-warexec.jar. 
+This war is a self-sustained Webapp with an embedded tomcat7. Execute the war as follows:
 
-java -jar addressbook ADDRESSBOOKFILE QUERY [QUERYPARAMS, ...]
+- java -jar addressbook-warexec.jar
+- On tomcat startup, go to the brower's url bar and type: http://localhost:8080/addressbook/exercise
+- From the control panel choose any of the three queries available: Get Eldest, Get By Gender and Get DOB Difference; and fill in their details. 
 
-ADDRESSBOOKFILE
-- The location of an address book with comma separated values as contact fields and each new line a new record. 
+## Iteration 2
+- Simple JQuery front end
+- Spring MVC to service browser requests.
+- Runs same queries and prints these to browser.
+- For simplicity addressbook is not changeable and styling and webfront is basic.
 
-QUERY: [searchGender, getEldest or getAgeDifference]
-- searchGender: search for gender, gender parameter required.
-- getEldest: get eldest.
-- getAgeDifference: Get age difference in days of two contacts, two name parameters required.
+## Build and Execution
 
-QUERYPARAMS:
-- for query searchGender: ["Male" or "Female"].
-- for query getAgeDifference these two space separated (use quotes): "Firstname Lastname" "Firstname Lastname"
-
-EXAMPLES
-- java -jar addressbook searchGender "Female" "C:\addressbook.csv"
-- java -jar addressbook getEldest "C:\addressbook.csv"
-- java -jar addressbook getAgeDifference "Adam Darmanin" "Joe Temple" "C:\addressbook.csv"
+- MAVEN: 
+- mvn clean install
+- mvn tomcat7:run: to start the embedded tomcat with the contructed WAR.
 
 ## The story 
 
@@ -32,21 +37,3 @@ The user wants to perform a simple set of queries on a lightweight address book.
 1. Given a list of people, when the user asks for a certain sex, then all members of that sex in the book are to be given.
 2. Given a list of people, when the user asks for the oldest, then the oldest member is returned.
 3. Given two people, when user asks the age difference, then the age difference is returned in days.
-
-## Iteration 1
-
-- Time estimate 1hr.
-- lightweight application with minimal code.
-- Embedded/in-memory DB for thin query logic.
-- Boot the given file or create contacts in DB.
-- An address book contact is made up of name, sex and date of birth.
-
-## Build and Execution
-
-- MAVEN: 
-- mvn clean install
-- mvn exec:java: for quick execution. Parameters can be found in the build section of the POM file.
-
-## Iteration 2 (Future)
-- Simple JQuery front end
-- Spring MVC to service browser requests.
