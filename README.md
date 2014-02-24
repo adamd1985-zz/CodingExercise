@@ -4,8 +4,8 @@
 
 The project is split into to iterations tagged on github, please select the iteration you need to download:
 
-- iteration-1: simple jar file that takes an address book and queries from the command line.
-- iteration-2: self contained webapp that presents a control panel and prints results on browser.
+- 1.0 (Iteration1): simple jar file that takes an address book and queries from the command line.
+- 2.0 (Iteration2): self contained webapp that presents a control panel and prints results on browser.
 
 ## USAGE
 
